@@ -186,7 +186,8 @@ instructions:
 
 #### Ingredient Field
 
-> [!NOTE] > `ingredients` as well as `additionalIngredients` are lists of ingredients that are used in the step.
+> [!NOTE]
+> `ingredients` as well as `additionalIngredients` are lists of ingredients that are used in the step.
 > The ingredients descripe what is needed to execute the step, while the additionalIngredients are used indirectly.
 
 | field       | type   | description                              | example                   |
