@@ -1,26 +1,42 @@
-# Reciyml
+# ReciYML
 
-Reciyml is an open standard for storing and sharing recipes in YAML format.
+![logo](./assets/logo.png)
 
-It aims to be simple yet powerful, and to be easily readable by both humans and machines.
-It is designed to be adaptable to a wide range of recipes, from simple to complex.
+ReciYML is an open standard for storing and sharing recipes in YAML format.
+
+It is designed to be simple yet powerful, making recipes easily readable by both humans and machines.
+ReciYML is adaptable to a wide range of recipes, from the simplest to the most complex.
 
 ## Motivation
 
-I wrote this standart because I wanted a simple way to store and share recipes in a format that is easy to read and write.
+I created ReciYML because I wanted a straightforward way to store and share recipes in a format that is both easy to read and write.
 
-I looked at several existing formats, but none of them quite fit my needs. They were either to limited in scope or to verbose.
-What do i mean by verbose? Most recipes found online have instructions that are writte as a long text, which is hard to parse by a machine -
-and even for humans it can be hard to follow.
+When exploring existing formats, I found them either too limited in scope or too verbose.
 
-I wanted something that breaks down every step in the most detailed jet simple way possible.
+### What’s wrong with “verbose”?
 
-Out of this need, Reciyml was born - a standart that models recipes as a collection of steps, each with its own set of instructions and ingredients.
+Many recipes online are written as long blocks of text, making them:
 
-To make this even more flexible, steps itself can have substeps, allowing for complex recipes to be described in a simple way.
+- Hard to parse for machines.
+- Challenging to follow for humans, especially for complex recipes with multiple steps.
 
-As file format I chose YAML, because it is easy to read and write, and is supported by a wide range of programming languages. But the
-idea of Reciyml can be implemented in any other file format.
+This even applies to some popular recipe formats in JSON or XML, which can be verbose and difficult to read.
+
+### My Solution
+
+ReciYML breaks down recipes into structured steps, each with its own set of:
+
+- Instructions
+- Ingredients
+- Metadata (e.g., images, duration, and yield).
+
+Each step can have substeps, creating a recursive structure that allows even the most complex recipes to be described simply.
+
+The chosen file format, YAML, is:
+
+- Easy to read and write.
+- Supported by many programming languages.
+  However, the concept behind ReciYML can be implemented in other formats like JSON or XML.
 
 ## Getting Started
 
@@ -49,7 +65,7 @@ MY_STEP_NAME: # the name of the step
   duration: "1h" # how long the step takes
   waitTime: "1h" # time to wait after the step is done
 
-  preparation: # instructions to execute the step
+  instructions: # instructions to execute the step
     - ... # omitted for brevity
 
   additionalIngredients:
@@ -75,9 +91,10 @@ steps:
 
 ### Full Specification
 
-Any Recipe is structured from a list of steps. Every step has multiple fields, some of which are optional.
+ReciYML describes recipes as a recursive collection of steps. Each step contains:
 
-A step has simple key-value, fields and komplex fields like `preparation`, `ingredients` and `steps`.
+- Basic fields: Key-value pairs.
+- Complex fields: Lists of instructions, ingredients, or substeps.
 
 #### Step Field
 
@@ -88,17 +105,17 @@ A step has simple key-value, fields and komplex fields like `preparation`, `ingr
 |  field                | type                  | description                                        | example                                     |
 | --------------------- | --------------------- | -------------------------------------------------- | ------------------------------------------- |
 | img                   | string                | URL to an image                                    | "https://example.com/image.jpg"             |
-| order                 | integer               | order of the step, see [order field](#order-field) | 1                                           |
-| info                  | string                | description of the step                            | "Mix the ingredients"                       |
-|  amount               | float                 | how much this step yield                           | 5                                           |
-| unit                  | string                | unit of the amount                                 | "Pieces"                                    |
-| duration              | date-string           | how long the step takes                            | "10min"                                     |
-| waitTime              | date-string           | time to wait after the step is done                | "1h"                                        |
-| preparation           | list of `Preparation` | instructions for executing the step                | see [Preperation field](#preperation-field) |
-| additionalIngredients | list of `Ingredient`  | ingredients that are used indirektly               | see [Ingredient field](#ingredient-field)   |
-| ingredients           | list of `Ingredient`  | ingredients that are used directly                 | see [Ingredient field](#ingredient-field)   |
-| steps                 | list of `Step`        | substeps of the step                               | see [Step field](#step-field)               |
-| meta  | any     |  additional info  |  `"Some additional info"` |
+| order                 | integer               | Prder of the step, see [order field](#order-field) | 1                                           |
+| info                  | string                | Description of the step                            | "Mix the ingredients"                       |
+|  amount               | float                 | Yiel of the step                                   | 5                                           |
+| unit                  | string                | Unit of the amount                                 | "Pieces"                                    |
+| duration              | date-string           | Time required for this step                        | "10min"                                     |
+| waitTime              | date-string           | Waiting time after the step                        | "1h"                                        |
+| instructions          | list of `Instruction` | Instructions for executing the step                | see [Instruction field](#instruction-field) |
+| additionalIngredients | list of `Ingredient`  | Directly used ingredients                          | see [Ingredient field](#ingredient-field)   |
+| ingredients           | list of `Ingredient`  | Indirectly used ingredients                        | see [Ingredient field](#ingredient-field)   |
+| steps                 | list of `Step`        | Substeps                                           | see [Step field](#step-field)               |
+| meta                  | any                   | Additional info                                    |  `"Some additional info"`                   |
 
 <details>
 <summary>Example</summary>
@@ -113,8 +130,8 @@ steps:
     unit: "g"
     duration: "10min"
     waitTime: "0" # no wait time, the field can be omitted
-    preparation:
-      - ... # see Preperation field
+    instruction:
+      - ... # see Instruction field
 
     additionalIngredients:
       - ... # see Ingredient field
@@ -142,23 +159,25 @@ if some steps have to be executed in parallel.
 > The preparation field is a list of instructions that describe how to
 > execute the step.
 
-| field | type    | description       | example                   |
-| ----- | ------- | ----------------- | ------------------------- |
-| value |  string |  some information |  `"10"`                   |
-| unit  | string  | some information  |  `"min"`                  |
-| info  | string  |  what to do       |  `"Mix the ingredients"`  |
-| meta  | any     |  additional info  |  `"Some additional info"` |
+| field | type   | description       | example                  |
+| ----- | ------ | ----------------- | ------------------------ |
+| value | string | Some information  | `"10"`                   |
+| unit  | string | Unit of the value | `"min"`                  |
+| info  | string | Instruction       | `"Mix the ingredients"`  |
+| meta  | any    | Additional info   | `"Some additional info"` |
 
 <details>
 <summary>Example</summary>
 
 ```yml
-preparation:
+instructions:
   - value: "200"
     unit: "Celsius"
     info: "Oven Temperature"
 
-preparation:
+# or
+
+instructions:
   - info: "Sive the flour"
   - info: "Mix everything together"
 ```
@@ -170,14 +189,14 @@ preparation:
 > [!NOTE] > `ingredients` as well as `additionalIngredients` are lists of ingredients that are used in the step.
 > The ingredients descripe what is needed to execute the step, while the additionalIngredients are used indirectly.
 
-| field       | type   | description                              | example            |
-| ----------- | ------ | ---------------------------------------- | ------------------ |
-| name        | string | name of the ingredient                   | "Flour"            |
-| amount      | float  | how much of the ingredient is needed     | 500                |
-| unit        | string | unit of the amount                       | "g"                |
-| temperature | float  | temperature of the ingredient in celsius | 20                 |
-| info        | string | additional information                   | "Room temperature" |
-| meta  | any     |  additional info  |  `"Some additional info"` |
+| field       | type   | description                              | example                   |
+| ----------- | ------ | ---------------------------------------- | ------------------------- |
+| name        | string | Ingredient name                          | "Flour"                   |
+| amount      | float  | Quantity                                 | 500                       |
+| unit        | string | Unit of measurement                      | "g"                       |
+| temperature | float  | Temperature of the ingredient in celsius | 20                        |
+| info        | string | Additional notes                         | "Room temperature"        |
+| meta        | any    | Custom metadata                          |  `"Some additional info"` |
 
 <details>
 <summary>Example</summary>
@@ -197,3 +216,7 @@ additionalIngredients:
 ```
 
 </details>
+
+## License
+
+ReciYML is open-source under the MIT License. Feel free to contribute or suggest improvements!
