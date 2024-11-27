@@ -220,3 +220,9 @@ additionalIngredients:
 ## License
 
 ReciYML is open-source under the MIT License. Feel free to contribute or suggest improvements!
+
+## Similar Projects
+
+- [Recipe - A Schema.org Type](https://schema.org/Recipe)
+- [Cooklang](https://cooklang.org)
+- [Open Recipe Format](https://open-recipe-format.readthedocs.io/en/latest/topics/tutorials/walkthrough.html)
