@@ -53,16 +53,15 @@ All fields of a step are optional, but it is recommended to include at least inf
 For the full list of available fields, see the [full specification](#full-specification).
 
 ```yaml
-MY_STEP_NAME: # the name of the step
+- name: "My Step" # the name of the step
   img: "URL"
 
-  order: 1 # see the full specification for more info
   info: "My step info" # description of the step
 
   amount: 1 # how much result this step produces
   unit: "g" # unit of the result
 
-  duration: "1h" # how long the step takes
+  duration: "10min" # how long the step takes
   waitTime: "1h" # time to wait after the step is done
 
   instructions: # instructions to execute the step
@@ -81,12 +80,14 @@ MY_STEP_NAME: # the name of the step
 The field `steps` is a list of sub-steps, which follow the same structure as the main steps.
 In this way the data-struczture is recursive, allowing for complex recipes to be described.
 
-The main entry point of a recipe is the `steps` field, which is a list of steps.
+The every receipe starts with a single step, which can have multiple substeps.
 
 ```yaml
-steps:
-  MY_STEP_NAME: ...
-  MY_OTHER_STEP_NAME: ...
+- name: ...
+  ...: ...
+  steps:
+    - name: ...
+      ...: ...
 ```
 
 ### Full Specification
@@ -102,58 +103,48 @@ ReciYML describes recipes as a recursive collection of steps. Each step contains
 > A step describes an action in a recipe, such as "Mix the ingredients" or "Bake for 30 minutes"
 > A step can have multiple substeps, which are described in the `steps` field, such as "Wipp egg whites", "Create a meringue", "Fold in the flour"
 
-|  field                | type                  | description                                        | example                                     |
-| --------------------- | --------------------- | -------------------------------------------------- | ------------------------------------------- |
-| img                   | string                | URL to an image                                    | "https://example.com/image.jpg"             |
-| order                 | integer               | Prder of the step, see [order field](#order-field) | 1                                           |
-| info                  | string                | Description of the step                            | "Mix the ingredients"                       |
-|  amount               | float                 | Yiel of the step                                   | 5                                           |
-| unit                  | string                | Unit of the amount                                 | "Pieces"                                    |
-| duration              | date-string           | Time required for this step                        | "10min"                                     |
-| waitTime              | date-string           | Waiting time after the step                        | "1h"                                        |
-| instructions          | list of `Instruction` | Instructions for executing the step                | see [Instruction field](#instruction-field) |
-| additionalIngredients | list of `Ingredient`  | Directly used ingredients                          | see [Ingredient field](#ingredient-field)   |
-| ingredients           | list of `Ingredient`  | Indirectly used ingredients                        | see [Ingredient field](#ingredient-field)   |
-| steps                 | list of `Step`        | Substeps                                           | see [Step field](#step-field)               |
-| meta                  | any                   | Additional info                                    |  `"Some additional info"`                   |
+| field                 | type                  | description                         | example                                     |
+| --------------------- | --------------------- | ----------------------------------- | ------------------------------------------- |
+| name                  | string                | Name of the step                    | "Mix the ingredients"                       |
+| img                   | string                | URL to an image                     | "https://example.com/image.jpg"             |
+| info                  | string                | Description of the step             | "In this step we will make the main batter" |
+| amount                | float                 | Yield of the step                   | 5                                           |
+| unit                  | string                | Unit of the amount                  | "Pieces"                                    |
+| duration              | date-string           | Time required for this step         | "10min"                                     |
+| waitTime              | date-string           | Waiting time after the step         | "1h"                                        |
+| instructions          | list of `Instruction` | Instructions for executing the step | see [Instruction field](#instruction-field) |
+| additionalIngredients | list of `Ingredient`  | Directly used ingredients           | see [Ingredient field](#ingredient-field)   |
+| ingredients           | list of `Ingredient`  | Indirectly used ingredients         | see [Ingredient field](#ingredient-field)   |
+| steps                 | list of `Step`        | Substeps                            | see [Step field](#step-field)               |
+| meta                  | any                   | Additional info                     | `"Some additional info"`                    |
 
 <details>
 <summary>Example</summary>
 
 ```yml
-steps:
-  Make Batter:
-    img: "https://example.com/batter.jpg"
-    order: 1
-    info: "Create the Batter"
-    amount: 500
-    unit: "g"
-    duration: "10min"
-    waitTime: "0" # no wait time, the field can be omitted
-    instruction:
-      - ... # see Instruction field
+- name: "Make Batter"
+  img: "https://example.com/batter.jpg"
+  info: "Create the Batter"
+  amount: 500
+  unit: "g"
+  duration: "10min"
+  waitTime: "0" # no wait time, the field can be omitted
+  instruction:
+    - ... # see Instruction field
 
-    additionalIngredients:
-      - ... # see Ingredient field
+  additionalIngredients:
+    - ... # see Ingredient field
 
-    ingredients:
-      - ... # see Ingredient field
+  ingredients:
+    - ... # see Ingredient field
 
-    steps: # substeps
-      - ...
+  steps: # substeps
+    - ...
 ```
 
 </details>
 
-#### Order Field
-
-The order field is used to specify the order of the steps in the recipe. Per default, the steps are sorted by the order
-they are defined in the file. If the order field is present, the steps are sorted by the order field instead.
-
-It can be also used to group steps together, by giving them the same order number. This can be useful
-if some steps have to be executed in parallel.
-
-#### Preparation Field
+#### Instructions Field
 
 > [!NOTE]
 > The preparation field is a list of instructions that describe how to
@@ -186,18 +177,18 @@ instructions:
 
 #### Ingredient Field
 
-> [!NOTE]
-> `ingredients` as well as `additionalIngredients` are lists of ingredients that are used in the step.
+> [!NOTE] > `ingredients` as well as `additionalIngredients` are lists of ingredients that are used in the step.
 > The ingredients descripe what is needed to execute the step, while the additionalIngredients are used indirectly.
 
-| field       | type   | description                              | example                   |
-| ----------- | ------ | ---------------------------------------- | ------------------------- |
-| name        | string | Ingredient name                          | "Flour"                   |
-| amount      | float  | Quantity                                 | 500                       |
-| unit        | string | Unit of measurement                      | "g"                       |
-| temperature | float  | Temperature of the ingredient in celsius | 20                        |
-| info        | string | Additional notes                         | "Room temperature"        |
-| meta        | any    | Custom metadata                          |  `"Some additional info"` |
+| field                | type    | description                                               | example                   |
+| -------------------- | ------- | --------------------------------------------------------- | ------------------------- |
+| name                 | string  | Ingredient name                                           | "Flour"                   |
+| amount               | float   | Quantity                                                  | 500                       |
+| unit                 | string  | Unit of measurement                                       | "g"                       |
+| temperature          | float   | Temperature of the ingredient in celsius                  | 20                        |
+| info                 | string  | Additional notes                                          | "Room temperature"        |
+| hideFromShoppingList | boolean | If the ingredient should be hidden from the shopping list | true                      |
+| meta                 | any     | Custom metadata                                           |  `"Some additional info"` |
 
 <details>
 <summary>Example</summary>
@@ -210,6 +201,8 @@ ingredients:
     info: "best use all-purpose flour"
   - name: "Eggs"
     amount: "3"
+  - name: "Love"
+    hideFromShoppingList: true
 
 additionalIngredients:
   - name: "Cooking Oil"
